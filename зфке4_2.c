@@ -22,7 +22,7 @@
 
 // CONFIG1H
 
-#pragma config OSC = HSPLL      // Oscillator Selection bits (HS oscillator, PLL enabled (Clock Frequency = 4 x FOSC1))
+#pragma config OSC = HS     // Oscillator Selection bits (HS oscillator, PLL enabled (Clock Frequency = 4 x FOSC1))
 
 #pragma config FCMEN = OFF      // Fail-Safe Clock Monitor Enable bit (Fail-Safe Clock Monitor disabled)
 
@@ -144,7 +144,7 @@
 
 #ifndef _XTAL_FREQ 
 
-#define _XTAL_FREQ 10000000 // ??????????? ???????? ???????  40 ???  ??? 
+#define _XTAL_FREQ 10000000 // ??????????? ???????? ???????  10 ???  ??? 
 
 #endif 
 
@@ -316,48 +316,6 @@ __delay_ms(1);
 
 } 
 
-
-
-void motor_a_change_Speed (signed char speed) 
-
-{
-
-    
-
-   if (speed>0) // ???????? ??????     
-
-{
-
-    CCPR1L=speed;         
-
-    PORTDbits.RD0=0;         
-
-    PORTDbits.RD1=1;     
-
-}     
-
-else if (speed<0) // ???????? ?????     
-
-{         
-
-    CCPR1L =-speed;         
-
-    PORTDbits.RD0=1;         
-
-    PORTDbits.RD1=0;     
-
-}     else //?????????     
-
-{         CCPR1L=0;         
-
-PORTDbits.RD0=0;         
-
-PORTDbits.RD1=0;     
-
-} 
-
-} 
-
 void Adc_init()     
 
 {
@@ -427,20 +385,20 @@ PR2=124;// ?????? ?????? ???
 T2CONbits.T2CKPS=0b00; //?????? ???????????? ?????? Timer2 ?????? 1 
 
 T2CONbits.TMR2ON=1;// ????????? ?????? Timer2
-    long speed, wall;
+    int speed, wall;
     int a;
     int j;
     int k;
-    speed = 100;
 lcd_init(); 
-//lcd_puts(0x0C,"Counter="); 
 Adc_init() ;
 while(1){
-        speed = read_Adc(7);
+    speed = read_Adc(7);
+    __delay_ms(5);
     wall = read_Adc(3);
-    //wall=2000;
+    LCD_clear();
+    inttolcd(0x89, wall);
     speed = speed / 2;
-    if ((wall>12)||(wall<2)){
+    if (wall<300){
         for (k=0;k<500;k++){
     CCPR1L=speed;
     CCPR2L=speed;
